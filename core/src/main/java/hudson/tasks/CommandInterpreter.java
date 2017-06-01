@@ -36,11 +36,11 @@ import hudson.model.Result;
 import hudson.model.TaskListener;
 import hudson.remoting.ChannelClosedException;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.Nonnull;
 
 /**
  * Common part between {@link Shell} and {@link BatchFile}.
@@ -52,9 +52,11 @@ public abstract class CommandInterpreter extends Builder {
      * Command to execute. The format depends on the actual {@link CommandInterpreter} implementation.
      */
     protected final String command;
+    private String[] escapeTargets;
 
-    public CommandInterpreter(String command) {
+    public CommandInterpreter(String command, String[] escapeTargets) {
         this.command = command;
+        this.escapeTargets = escapeTargets;
     }
 
     public final String getCommand() {
@@ -103,8 +105,14 @@ public abstract class CommandInterpreter extends Builder {
                 // on Windows environment variables are converted to all upper case,
                 // but no such conversions are done on Unix, so to make this cross-platform,
                 // convert variables to all upper cases.
-                for(Map.Entry<String,String> e : build.getBuildVariables().entrySet())
-                    envVars.put(e.getKey(),e.getValue());
+                for(Map.Entry<String,String> e : build.getBuildVariables().entrySet()) {
+                    String envVarValue = e.getValue();
+                    for (int i = 0; i < escapeTargets.length; i++) {
+                        String escapeTarget = escapeTargets[i];
+                        envVarValue = envVarValue.replace(escapeTarget, "\\" + escapeTarget);
+                    }
+                    envVars.put(e.getKey(), envVarValue);
+                }
 
                 r = join(launcher.launch().cmds(buildCommandLine(script)).envs(envVars).stdout(listener).pwd(ws).start());
 

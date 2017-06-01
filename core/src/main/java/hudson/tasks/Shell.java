@@ -23,14 +23,12 @@
  */
 package hudson.tasks;
 
+import hudson.Extension;
 import hudson.FilePath;
 import hudson.Util;
-import hudson.Extension;
 import hudson.model.AbstractProject;
 import hudson.remoting.VirtualChannel;
 import hudson.util.FormValidation;
-import java.io.IOException;
-import java.io.ObjectStreamException;
 import hudson.util.LineEndingConversion;
 import jenkins.security.MasterToSlaveCallable;
 import net.sf.json.JSONObject;
@@ -40,16 +38,17 @@ import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.DoNotUse;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
-import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.QueryParameter;
-
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.kohsuke.stapler.StaplerRequest;
 
 import javax.annotation.CheckForNull;
+import java.io.IOException;
+import java.io.ObjectStreamException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Executes a series of commands by using a shell.
@@ -60,7 +59,8 @@ public class Shell extends CommandInterpreter {
 
     @DataBoundConstructor
     public Shell(String command) {
-        super(LineEndingConversion.convertEOL(command, LineEndingConversion.EOLType.Unix));
+        super(LineEndingConversion.convertEOL(command, LineEndingConversion.EOLType.Unix),
+                new String[]{"$"});
     }
 
     private Integer unstableReturn;
@@ -151,7 +151,7 @@ public class Shell extends CommandInterpreter {
 
         /**
          *  @deprecated 1.403
-         *      Use {@link #getShellOrDefault(hudson.remoting.VirtualChannel) }.
+         *      Use {@link #getShellOrDefault(VirtualChannel) }.
          */
         @Deprecated
         public String getShellOrDefault() {
