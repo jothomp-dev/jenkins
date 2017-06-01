@@ -60,7 +60,7 @@ public class Shell extends CommandInterpreter {
     @DataBoundConstructor
     public Shell(String command) {
         super(LineEndingConversion.convertEOL(command, LineEndingConversion.EOLType.Unix),
-                new String[]{"$"});
+                new String[] {"$"});
     }
 
     private Integer unstableReturn;

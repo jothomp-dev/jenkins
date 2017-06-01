@@ -54,6 +54,10 @@ public abstract class CommandInterpreter extends Builder {
     protected final String command;
     private String[] escapeTargets;
 
+    public CommandInterpreter(String command) {
+        this(command, new String[] {});
+    }
+
     public CommandInterpreter(String command, String[] escapeTargets) {
         this.command = command;
         this.escapeTargets = escapeTargets;
